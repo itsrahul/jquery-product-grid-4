@@ -17,12 +17,12 @@ export default class UrlHash
   {
     this.productGrid.pageSize = this.pageSize;
 
-    $("#pagination").prop("selectedIndex", this.selectedIndex);
+    this.productGrid.$paginationSelect.prop("selectedIndex", this.selectedIndex);
 
     this.productGrid.showAvailable = this.showAvailable;
     if(this.productGrid.showAvailable == "true")
     {
-      $("label[for=sold_out]").trigger("click")
+      this.productGrid.$showAllLabelElement.trigger("click")
     }
 
     this.productGrid.filteredColor = this.colorFilter;

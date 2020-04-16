@@ -48,7 +48,7 @@ export default class ProductGrid {
   makePagination()
   {
     let pages = [3,6,9];
-    let $paginationSelect = $("<select>", {id: "pagination"});
+    this.$paginationSelect = $("<select>", {id: "pagination"});
     pages.forEach((item) => {
       let pagination =
       $("<option>", {id: item}).text(item)
@@ -57,12 +57,12 @@ export default class ProductGrid {
           this.filterItems();
         })
 
-      $paginationSelect.append(pagination)
+      this.$paginationSelect.append(pagination)
     })
 
     this.$filterContainer
       .append("<br>")
-      .append($paginationSelect);
+      .append(this.$paginationSelect);
 
   }
 
@@ -153,31 +153,31 @@ export default class ProductGrid {
 
   makeShowAllToggle()
   {
-    let $itemInputElement = $("<input>", { type: "checkbox",id: "sold_out", class: "sold_out" })
+    let $showAllInputElement = $("<input>", { type: "checkbox",id: "sold_out", class: "sold_out" })
       .on("click", () => this.addFiltering() );
-    let $itemLabelElement = $("<label>", { for: "sold_out", text: "Show Available"});
+    this.$showAllLabelElement = $("<label>", { for: "sold_out", text: "Show Available"});
     this.$filterContainer
       .append($("<br>"))
-      .append($itemInputElement)
-      .append($itemLabelElement)
+      .append($showAllInputElement)
+      .append(this.$showAllLabelElement)
   }
 
   addFiltering()
   {
-    let checkbox = $(event.target);
-    let category = checkbox.attr("id");
-    let categoryType = checkbox.attr("class");
+    let $checkbox = $(event.target);
+    let category = $checkbox.attr("id");
+    let categoryType = $checkbox.attr("class");
     if(categoryType == "sold_out")
     {
-      checkbox.is(':checked') ? this.showAvailable = "true" : this.showAvailable = "false";
+      $checkbox.is(':checked') ? this.showAvailable = "true" : this.showAvailable = "false";
     }
     else if(categoryType == "brand")
     {
-      checkbox.is(':checked') ? this.filteredBrand.add(category) : this.filteredBrand.delete(category)
+      $checkbox.is(':checked') ? this.filteredBrand.add(category) : this.filteredBrand.delete(category)
     }
     else if(categoryType == "color")
     {
-      checkbox.is(':checked') ? this.filteredColor.add(category) : this.filteredColor.delete(category)
+      $checkbox.is(':checked') ? this.filteredColor.add(category) : this.filteredColor.delete(category)
     }
     this.filterItems();
   }
