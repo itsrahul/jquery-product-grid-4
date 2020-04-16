@@ -17,7 +17,7 @@ export default class UrlHash
   {
     this.productGrid.pageSize = this.pageSize;
 
-    $("select").prop("selectedIndex", this.selectedIndex);
+    $("#pagination").prop("selectedIndex", this.selectedIndex);
 
     this.productGrid.showAvailable = this.showAvailable;
     if(this.productGrid.showAvailable == "true")

@@ -48,7 +48,7 @@ export default class ProductGrid {
   makePagination()
   {
     let pages = [3,6,9];
-    let $paginationSelect = $("<select id=pagination></select>");
+    let $paginationSelect = $("<select>", {id: "pagination"});
     pages.forEach((item) => {
       let pagination =
       $("<option>", {id: item}).text(item)
