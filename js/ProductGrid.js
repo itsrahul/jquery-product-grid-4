@@ -8,7 +8,9 @@ export default class ProductGrid {
     this.productList = [];
     this.uniqueColor = [];
     this.uniqueBrand = [];
-    // this.showAvailable = false;
+    this.pageSize = 3;
+    this.displayPage;
+    this.showAvailable = "false";
     this.filteredColor = new Set();
     this.filteredBrand = new Set();
     this.jsonUrl = options.jsonUrl;
@@ -19,7 +21,7 @@ export default class ProductGrid {
     this.styleClassName    = options.styleClassName;
     this.filterByAttribute = options.filterByAttribute;
     this.itemToDisplay     = [];
-    this.urlHash = new UrlHash(window.location.hash);
+    this.urlHash = new UrlHash(window.location.hash, this);
   }
 
   init() {
@@ -35,36 +37,12 @@ export default class ProductGrid {
         this.makePagination();
         this.createProducts();
         this.createFilterArrays();
-        this.applyCustomFilter();
+        this.urlHash.applyInputFilter();
         this.filterItems();
-        $("a#"+this.urlHash.displayPage).trigger("click");
+        // console.log('this.displayPage :', $("a#3"));
+        $("a#"+this.displayPage).trigger("click");
       }
     });
-  }
-
-  applyCustomFilter()
-  {
-    this.pageSize = this.urlHash.pageSize;
-    $("select").prop("selectedIndex", this.urlHash.selectedIndex);
-
-    this.showAvailable = this.urlHash.showAvailable;
-    if(this.showAvailable == "true")
-    {
-      $("label[for=sold_out]").trigger("click")
-    }
-
-    this.filteredColor = this.urlHash.colorFilter;
-    this.filteredBrand = this.urlHash.brandFilter;  
-
-    for(let brand of this.urlHash.brandFilter)
-    {
-      $(`label[for="${brand}"]`).trigger("click")
-    }
-    for(let color of this.urlHash.colorFilter)
-    {
-      $(`label[for="${color}"]`).trigger("click")
-    }
-
   }
 
   makePagination()
@@ -76,9 +54,6 @@ export default class ProductGrid {
       $("<option>", {id: item}).text(item)
         .on("click", () => {
           this.pageSize = item;
-          this.urlHash.url.delete("pageSize");
-          this.urlHash.url.set("pageSize", item);
-          window.location.hash = this.urlHash.url.toString()
           this.filterItems();
         })
 
@@ -96,38 +71,17 @@ export default class ProductGrid {
     this.itemToDisplay = this.productList;
     if(this.showAvailable == "true")
     {
-      this.urlHash.url.set("showAvailable", "true");
       this.itemToDisplay = this.productList.filter((item) => { return (item.sold_out == 0) })
     }
-    else
-    {
-      this.urlHash.url.set("showAvailable", "false");
-    }
-    window.location.hash = this.urlHash.url.toString();
 
     if(this.filteredColor.size > 0)
     {
-      this.urlHash.url.delete("color");
-      this.urlHash.url.append("color", Array.from(this.filteredColor));
       this.itemToDisplay = this.itemToDisplay.filter((item) => { return this.filteredColor.has(item.color)} )
     }
-    else
-    {
-      this.urlHash.url.delete("color");
-    }
-    window.location.hash = this.urlHash.url.toString();
     if(this.filteredBrand.size > 0)
     {
-      this.urlHash.url.delete("brand");
-      this.urlHash.url.append("brand", Array.from(this.filteredBrand));
       this.itemToDisplay = this.itemToDisplay.filter((item) => { return this.filteredBrand.has(item.brand)} )
     }
-    else
-    {
-      this.urlHash.url.delete("brand");
-    }
-    window.location.hash = this.urlHash.url.toString();
-
     this.addPagination();
   }
 
@@ -142,9 +96,8 @@ export default class ProductGrid {
       pagewiseProducts.push(this.itemToDisplay.slice(index, index+this.pageSize));
       let $pageIndex = $('<a>',{id: count, text: count})
       .on("click", (event) => {
-        this.urlHash.url.delete("displayPage");
-        this.urlHash.url.set("displayPage", event.target.text);
-        window.location.hash = this.urlHash.url.toString()
+        this.displayPage = event.target.text;
+        this.urlHash.refreshURL();
         Display.show(pagewiseProducts[event.target.text-1], this.$displayContainer, this.styleClassName);
         $(event.target).addClass("highlight").siblings().removeClass("highlight");
       })
@@ -154,6 +107,8 @@ export default class ProductGrid {
 
     this.$footerContainer.children().first().addClass("highlight");
     Display.show(pagewiseProducts[0], this.$displayContainer, this.styleClassName);
+
+    this.urlHash.refreshURL();
   }
 
   createProducts()
